@@ -2,7 +2,7 @@
   "name": "my-extension",
   "version": "1.0.0",
   "description": "A Vue.js web extension",
-  "author": "tkawakita <tomoya.kawakita110634@e-seikatsu.co.jp>",
+  "author": "tkawakita",
   "engines": {
     "node": ">=10"
   },
