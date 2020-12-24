@@ -1,0 +1,25 @@
+{
+  "name": "BETTeR-class",
+  "description": "BETTeR-class is the extension of 'e-class' for Doshisha Univ.",
+  "version": null,
+  "manifest_version": 2,
+  "permissions": ["tabs", "storage"],
+  "icons": {
+    "48": "icons/icon_48.png",
+    "128": "icons/icon_128.png"
+  },
+  "background": {
+    "scripts": ["./background.js"],
+    "persistent": false
+  },
+  "browser_action": {
+    "default_title": "test1",
+    "default_popup": "popup/popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://eclass.doshisha.ac.jp/webclass/*"],
+      "js": ["./content.js"]
+    }
+  ]
+}
