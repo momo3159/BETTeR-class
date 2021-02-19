@@ -5,29 +5,13 @@ const BASE = 'https://eclass.doshisha.ac.jp';
 const REPORT = 'レポート';
 const QUIZ = '一問一答';
 
-/**
- * e-classのホーム画面を開いている時に
- * 科目名とurlを取得する
- * 取得した値はVuexにlectureInfoとして格納
- */
-
-const getTimeTable = () => {
-  return document.getElementById('schedule-table');
-};
-
-const getPanels = () => {
-  return document.getElementsByClassName('panel');
-};
-
 const isNotTakingLecture = square => {
   const colAttr = square.getAttribute('class');
   return colAttr.indexOf('blank') > -1 || colAttr === 'schedule-table-class_order';
 };
 
-const isLectureNameFound = (lectureNamesAndUrls, lectureName) => {
-  return lectureNamesAndUrls.find(lectureNamesAndUrl => {
-    return lectureNamesAndUrl.name === lectureName;
-  });
+const isLectureNameFound = (lectures, lectureName) => {
+  return lectureName in lectures;
 };
 
 const withinDeadline = (date, deadline) => {
@@ -43,8 +27,9 @@ const withinDeadline = (date, deadline) => {
 const isNotReportAndQuiz = category => {
   return category.indexOf(REPORT) === -1 && category.indexOf(QUIZ) === -1;
 };
-const getLectureNamesAndUrls = timeTable => {
-  const lectureNamesAndUrls = [];
+
+const getLectures = timeTable => {
+  const lectures = {};
 
   // [tr, tr, ..., tr]
   const tableRows = timeTable.children[1].children;
@@ -55,58 +40,65 @@ const getLectureNamesAndUrls = timeTable => {
         continue;
       }
 
-      const lectureName = square.children[0].children[0].innerText;
+      const lectureName = square.children[0].children[0].innerText.substring(3).split(' ')[0];
       const url = square.children[0].children[0].getAttribute('href');
 
-      if (isLectureNameFound(lectureNamesAndUrls, lectureName)) {
+      // 複数コマの授業に対応（e.g 情報工学実験1）
+      if (isLectureNameFound(lectures, lectureName)) {
         continue;
       }
 
-      lectureNamesAndUrls.push({
-        name: lectureName,
-        url: BASE + url,
-      });
+      lectures[lectureName] = { url: BASE + url, homeworks: {} };
     }
   }
 
-  return lectureNamesAndUrls;
+  return lectures;
 };
 
-const getHomeWorksOfSession = session => {
+const getTimeTable = () => {
+  return document.getElementById('schedule-table');
+};
+
+const getPanels = () => {
+  return document.getElementsByClassName('panel');
+};
+
+const getHomeWorksOfLecture = sessions => {
   // const panelHeader = session.children[0];
   // const panelTitle = panelHeader.children[0].innerText;
+  const homeworks = {};
 
-  const ItemsOfSession = session.children[1].children;
+  for (const session of sessions) {
+    const itemsOfSession = session.children[1].children;
 
-  const res = [];
-  for (const item of ItemsOfSession) {
-    const content = item.children[0];
-    const contentInfo = content.children[0];
-    // const contentDetail = content.children[1]
+    for (const item of itemsOfSession) {
+      // const content = item.children[0];
+      const contentInfo = item.children[0].children[0];
+      // const contentDetail = content.children[1]
+      const contentCategory = contentInfo.children[1].innerText;
 
-    const contentCategory = contentInfo.children[1].innerText;
-    if (isNotReportAndQuiz(contentCategory)) {
-      continue;
-    }
+      if (isNotReportAndQuiz(contentCategory)) {
+        continue;
+      }
 
-    let title = contentInfo.children[0].children[0].innerText;
-    if (title === 'New') {
-      title = contentInfo.children[0].children[1].innerText;
-    }
+      let title = contentInfo.children[0].children[0].innerText;
+      if (title === 'New') {
+        title = contentInfo.children[0].children[1].innerText;
+      }
 
-    const periodOfAvailable = contentInfo.children[2].children[1].innerText;
-    const [, deadline] = periodOfAvailable.split(' - ');
+      const periodOfAvailable = contentInfo.children[2].children[1].innerText;
+      const [, deadline] = periodOfAvailable.split(' - ');
 
-    if (withinDeadline(new Date(), deadline)) {
-      res.push({
-        title,
-        deadline,
-        isDone: false,
-      });
+      if (withinDeadline(new Date(), deadline)) {
+        homeworks[title] = {
+          deadline,
+          idDone: false,
+        };
+      }
     }
   }
 
-  return res;
+  return homeworks;
 };
 
 const getPrevBtn = () => {
@@ -114,98 +106,166 @@ const getPrevBtn = () => {
   return prevBtn;
 };
 
-const main = async () => {
-  const items = await browser.storage.local.get(['canParsed', 'alreadyParsed', 'lectureCount']);
-  let alreadyParsed = items.alreadyParsed;
-  let canParsed = items.canParsed;
+const STATE = {
+  SCRAPE_TIMETABLE: 'SCRAPE_TIMETABLE',
+  BEFORE_SCRAPE_LECTURE_PAGE: 'BEFORE_SCRAPE_LECTURE_PAGE',
+  SCRAPE_LECTURE_PAGE: 'SCRAPE_LECTURE_PAGE',
+  COMPLETE: 'COMPLETE',
+  EXIT: 'EXIT',
+};
 
-  // 時間割をパース ・・・　①
-  if (!alreadyParsed && canParsed) {
-    // await browser.storage.local.remove('homeworks');
-    // await browser.storage.local.set({'homeworks': []})
+class Scraper {
+  constructor() {
+    const { state } = browser.storage.local.get(['state']);
 
-    const timeTable = getTimeTable();
-    const lectureInfo = getLectureNamesAndUrls(timeTable);
-
-    alreadyParsed = true;
-    await browser.storage.local.set({ timetables: lectureInfo });
-    await browser.storage.local.set({ lectures: lectureInfo });
-    await browser.storage.local.set({ alreadyParsed: true });
-    await browser.storage.local.set({ lectureCount: lectureInfo.length });
-
-    const { homeworks } = await browser.storage.local.get('homeworks');
-    await browser.storage.local.set({ oldHomeWorks: homeworks });
-    await browser.storage.local.set({ homeworks: [] });
-  }
-
-  // ページ遷移→課題を取得
-  if (alreadyParsed && canParsed) {
-    const { beforeGetHW } = await browser.storage.local.get(['beforeGetHW']);
-
-    if (beforeGetHW) {
-      const { lectures, lectureCount } = await browser.storage.local.get(['lectures', 'lectureCount']);
-
-      if (lectureCount <= 0) {
-        // 終了の処理を記述
-        await browser.storage.local.set({ canParsed: false });
-        await browser.storage.local.set({ alreadyParsed: false });
-        canParsed = false;
-        alreadyParsed = false;
-
-        const { homeworks, oldHomeWorks } = await browser.storage.local.get(['homeworks', 'oldHomeWorks']);
-        for (let i = 0; i < homeworks.length; i++) {
-          const lecName = homeworks[i].lectureName;
-          for (let j = 0; j < homeworks[i].homeworks.length; j++) {
-            const title = homeworks[i].homeworks[j].title;
-            for (let k = 0; k < oldHomeWorks.length; k++) {
-              if (oldHomeWorks[k].lectureName !== lecName) {
-                continue;
-              }
-              for (let l = 0; l < oldHomeWorks[k].homeworks.length; l++) {
-                if (oldHomeWorks[k].homeworks[l].title !== title) {
-                  continue;
-                }
-                homeworks[i].homeworks[j].isDone = oldHomeWorks[k].homeworks[l].isDone;
-              }
-            }
-          }
-        }
-
-        await browser.storage.local.set({ homeworks: homeworks });
-        alert('課題一覧の取得が終了しました');
-        return;
-      } else {
-        const lecture = lectures.pop();
-        await browser.storage.local.set({ lectures: lectures });
-        await browser.storage.local.set({ lectureCount: lectureCount - 1 });
-        await browser.storage.local.set({ beforeGetHW: false });
-
-        window.location.href = lecture.url;
-      }
+    if (state === STATE.BEFORE_SCRAPE_LECTURE_PAGE) {
+      this.state = new BeforeParseLecturePageState();
+    } else if (state === STATE.SCRAPE_LECTURE_PAGE) {
+      this.state = new ParseLecturePageState();
+    } else if (state === STATE.COMPLETE) {
+      this.state = new CompleteState();
+    } else if (state === STATE.SCRAPE_TIMETABLE) {
+      this.state = new TimeTableState();
     } else {
-      // 課題を追加
-      const res = {
-        lectureName: '',
-        homeworks: [],
-      };
-      let lectureName = document.getElementsByClassName('course-name')[0].innerText;
-      res.lectureName = lectureName.substring(1).split(' ')[0];
-
-      const panels = getPanels();
-      for (let panel of panels) {
-        res.homeworks.push(...getHomeWorksOfSession(panel));
-      }
-
-      const { homeworks: stragedHomeworks } = await browser.storage.local.get(['homeworks']);
-      stragedHomeworks.push(res);
-
-      await browser.storage.local.set({ homeworks: stragedHomeworks });
-      await browser.storage.local.set({ beforeGetHW: true });
-      const prevBtn = getPrevBtn();
-      console.log('残り数' + (await browser.storage.local.get(['lectureCount'])).lectureCount);
-      prevBtn.click();
+      this.state = STATE;
     }
   }
+
+  async scrapeInformation() {
+    this.state.scrapeInformation();
+  }
+
+  async saveOnLocalStorage() {
+    await this.state.saveOnLocalStorage();
+  }
+
+  async stateTransition() {
+    this.state.stateTransition();
+  }
+
+  async pageTransition() {
+    this.state.pageTransition();
+  }
+
+  isNotAllowedToWork() {
+    return this.state === STATE.EXIT;
+  }
+}
+
+class TimeTableState {
+  async scrapeInformation() {
+    const timeTable = getTimeTable();
+    const lectures = getLectures(timeTable);
+    const { lectures: oldLectures } = await browser.storage.local.get('lectures');
+
+    await browser.storage.local.set({
+      lectures,
+      oldLectures,
+      lectureNames: lectures.keys(),
+      oldLectureNames: oldLectures.keys(),
+      lectureCount: lectures.keys().length,
+    });
+  }
+
+  async stateTransition() {
+    await browser.storage.local.set({ state: STATE.BEFORE_SCRAPE_LECTURE_PAGE });
+  }
+
+  async pageTransition() {
+    location.reload();
+  }
+}
+
+class BeforeParseLecturePageState {
+  async scrapeInformation() {
+    // 何もしない
+  }
+
+  async stateTransition() {
+    await browser.storage.local.set({
+      state: STATE.SCRAPE_LECTURE_PAGE,
+    });
+  }
+
+  async pageTransition() {
+    const { lectures, lectureNames, lectureCount } = browser.storage.local.get(['lectures', 'lectureNames', 'lectureCount']);
+    const lectureName = lectureNames.pop();
+
+    await browser.storage.local.set({
+      lectureNames,
+      lectureCount: lectureCount - 1,
+    });
+
+    window.location.href = lectures[lectureName].url;
+  }
+}
+
+class ParseLecturePageState {
+  async scrapeInformation() {
+    const { lectures } = await browser.storage.local.get(['lectures']);
+    const lectureName = document
+      .getElementsByClassName('course-name')[0]
+      .innerText.substring(1)
+      .split(' ')[0];
+
+    const panels = getPanels();
+    const homeworks = getHomeWorksOfLecture(panels);
+    lectures[lectureName].homeworks = homeworks;
+
+    await browser.storage.local.set({ lectures });
+    console.log('残り数' + (await browser.storage.local.get(['lectureCount'])).lectureCount);
+  }
+
+  async stateTransition() {
+    const { lectureCount } = await browser.storage.local.get(['lectureCount']);
+
+    if (lectureCount > 0) {
+      browser.storage.local.set({ state: STATE.BEFORE_SCRAPE_LECTURE_PAGE });
+    } else {
+      browser.storage.local.set({ state: STATE.COMPLETE });
+    }
+  }
+
+  async pageTransition() {
+    const prevBtn = getPrevBtn();
+    prevBtn.click();
+  }
+}
+
+class CompleteState {
+  async scrapeInformation() {
+    const { lectures, oldLectures } = await browser.storage.local.get(['lectures', 'oldLectures']);
+    const lectureNames = lectures.keys();
+
+    lectureNames.forEach(name => {
+      const titlesOfHomeworks = lectures[name]['homeworks'].keys();
+      titlesOfHomeworks.forEach(title => {
+        if (oldLectures[name]['homeworks'][title]) {
+          lectures[name]['homeworks'][title]['isDone'] = oldLectures[name]['homeworks'][title]['isDone'];
+        }
+      });
+    });
+    await browser.storage.local.set({ lectures });
+  }
+
+  async stateTransition() {
+    await browser.storage.local.set({ state: STATE.EXIT });
+  }
+
+  async pageTransition() {
+    alert('課題一覧の取得が終了しました');
+  }
+}
+
+const main = async () => {
+  const scraper = new Scraper();
+  if (scraper.isNotAllowedToWork()) {
+    return;
+  }
+
+  await scraper.scrapeInformation();
+  await scraper.stateTransition();
+  await scraper.pageTransition();
 };
 
 main();

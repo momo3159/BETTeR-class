@@ -1,4 +1,3 @@
-import store from './store';
 global.browser = require('webextension-polyfill');
 
 // インストールした時に実行
@@ -9,17 +8,14 @@ browser.runtime.onInstalled.addListener(function() {
    * lectures: 履修講義一覧
    * lectureCount: 履修講義数
    * homeworks: 課題一覧
-   * timetables: ポップアップで用いるため
-   * isTopPage
-   * isLecPage
    *
    */
   browser.storage.local.set({
     state: 'SCRAPE_TIMETABLE',
-    lectures: [],
+    lectures: {},
+    oldLectures: {},
+    lectureNames: [],
     lectureCount: 0,
-    homeworks: [],
-    oldHomeWorks: [],
   });
 });
 

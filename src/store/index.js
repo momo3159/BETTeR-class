@@ -8,7 +8,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     canParsed: false,
-    alreadyParsed: false,
+    isTimeTableParsed: false,
     beforeGetHW: true,
     lectures: {},
     lectureCount: 0,
@@ -17,7 +17,7 @@ export default new Vuex.Store({
     updateCanParsed(state, payload) {
       state.canParsed = payload.canParsed;
     },
-    updateAlreadyParsed(state, payload) {
+    updateIsTimeTableParsed(state, payload) {
       state.alreadyParsed = payload.alreadyParsed;
     },
     updateBeforeGetHomeWorks(state, payload) {
