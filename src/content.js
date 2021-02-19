@@ -15,6 +15,10 @@ const getTimeTable = () => {
   return document.getElementById('schedule-table');
 };
 
+const getPanels = () => {
+  return document.getElementsByClassName('panel');
+};
+
 const isNotTakingLecture = square => {
   const colAttr = square.getAttribute('class');
   return colAttr.indexOf('blank') > -1 || colAttr === 'schedule-table-class_order';
@@ -27,7 +31,7 @@ const isLectureNameFound = (lectureNamesAndUrls, lectureName) => {
 };
 
 // 時間割をパース -> セルに分割
-const parseTimeTable = timeTable => {
+const getLectureNamesAndUrls = timeTable => {
   const lectureNamesAndUrls = [];
 
   // [tr, tr, ..., tr]
@@ -54,10 +58,6 @@ const parseTimeTable = timeTable => {
   }
 
   return lectureNamesAndUrls;
-};
-
-const getPanels = () => {
-  return document.getElementsByClassName('panel');
 };
 
 const parseSection = section => {
@@ -123,7 +123,7 @@ const main = async () => {
     // await browser.storage.local.set({'homeworks': []})
 
     const timeTable = getTimeTable();
-    const lectureInfo = parseTimeTable(timeTable);
+    const lectureInfo = getLectureNamesAndUrls(timeTable);
 
     alreadyParsed = true;
     await browser.storage.local.set({ timetables: lectureInfo });
