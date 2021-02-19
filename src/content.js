@@ -30,6 +30,16 @@ const isLectureNameFound = (lectureNamesAndUrls, lectureName) => {
   });
 };
 
+const withinDeadline = (date, deadline) => {
+  // format: 2020/12/19 23:57
+  const [ymd, t] = deadline.split(' ');
+  const [y, m, d] = ymd.split('/');
+  const [h, min] = t.split(':');
+  const endDate = new Date(y, parseInt(m) - 1, d, h, min);
+
+  return endDate - date > 0;
+};
+
 // 時間割をパース -> セルに分割
 const getLectureNamesAndUrls = timeTable => {
   const lectureNamesAndUrls = [];
@@ -85,20 +95,12 @@ const parseSection = section => {
       title = contentInfo.children[0].children[1].innerText;
     }
     const periodOfAvailable = contentInfo.children[2].children[1].innerText;
-    const [start, end] = periodOfAvailable.split(' - ');
+    const [, deadline] = periodOfAvailable.split(' - ');
 
-    // TODO: 利用可能期間を過ぎているものは追加しない
-    // 2020/12/19 23:57
-    const [ymd, t] = end.split(' ');
-    const [y, m, d] = ymd.split('/');
-    const [h, min] = t.split(':');
-    const endDate = new Date(y, parseInt(m) - 1, d, h, min);
-    const now = new Date();
-
-    if (endDate - now > 0) {
+    if (withinDeadline(new Date(), deadline)) {
       res.push({
         title,
-        end,
+        deadline,
         isDone: false,
       });
     }
