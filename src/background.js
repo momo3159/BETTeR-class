@@ -11,7 +11,7 @@ browser.runtime.onInstalled.addListener(function() {
    *
    */
   browser.storage.local.set({
-    state: 'SCRAPE_TIMETABLE',
+    state: '',
     lectures: {},
     oldLectures: {},
     lectureNames: [],

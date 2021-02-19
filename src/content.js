@@ -125,8 +125,10 @@ class Scraper {
       this.state = new CompleteState();
     } else if (state === STATE.SCRAPE_TIMETABLE) {
       this.state = new TimeTableState();
+    } else if (state === STATE.EXIT) {
+      this.state = STATE.EXIT;
     } else {
-      this.state = STATE;
+      this.state = STATE.EXIT;
     }
   }
 
@@ -260,10 +262,14 @@ class CompleteState {
 
 const main = async () => {
   const scraper = new Scraper();
+  await scraper.init();
+
   if (scraper.isNotAllowedToWork()) {
+    // alert(await browser.storage.local.get('state').state);
+    await browser.storage.local.set({ state: '' });
     return;
   }
-  await scraper.init();
+
   // await console.log("hogehoge")
   await scraper.scrapeInformation();
   await scraper.stateTransition();
