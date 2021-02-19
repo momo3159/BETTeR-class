@@ -40,7 +40,9 @@ const withinDeadline = (date, deadline) => {
   return endDate - date > 0;
 };
 
-// 時間割をパース -> セルに分割
+const isNotReportAndQuiz = category => {
+  return category.indexOf(REPORT) === -1 && category.indexOf(QUIZ) === -1;
+};
 const getLectureNamesAndUrls = timeTable => {
   const lectureNamesAndUrls = [];
 
@@ -70,30 +72,28 @@ const getLectureNamesAndUrls = timeTable => {
   return lectureNamesAndUrls;
 };
 
-const parseSection = section => {
-  const panelHeader = section.children[0];
+const getHomeWorksOfSession = session => {
+  // const panelHeader = session.children[0];
   // const panelTitle = panelHeader.children[0].innerText;
 
-  const listGroup = section.children[1];
-  const listGroupItems = listGroup.children;
+  const ItemsOfSession = session.children[1].children;
 
   const res = [];
-  for (let item of listGroupItems) {
+  for (const item of ItemsOfSession) {
     const content = item.children[0];
     const contentInfo = content.children[0];
     // const contentDetail = content.children[1]
 
     const contentCategory = contentInfo.children[1].innerText;
-    // クイズでもレポートでもないもの
-    if (contentCategory.indexOf(REPORT) === -1 && contentCategory.indexOf(QUIZ) === -1) {
+    if (isNotReportAndQuiz(contentCategory)) {
       continue;
     }
 
     let title = contentInfo.children[0].children[0].innerText;
-
     if (title === 'New') {
       title = contentInfo.children[0].children[1].innerText;
     }
+
     const periodOfAvailable = contentInfo.children[2].children[1].innerText;
     const [, deadline] = periodOfAvailable.split(' - ');
 
@@ -193,7 +193,7 @@ const main = async () => {
 
       const panels = getPanels();
       for (let panel of panels) {
-        res.homeworks.push(...parseSection(panel));
+        res.homeworks.push(...getHomeWorksOfSession(panel));
       }
 
       const { homeworks: stragedHomeworks } = await browser.storage.local.get(['homeworks']);
