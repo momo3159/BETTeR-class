@@ -36,7 +36,6 @@
 
 <script>
 import Class from './Class';
-import store from '../store/index';
 global.browser = require('webextension-polyfill');
 
 export default {
