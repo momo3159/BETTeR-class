@@ -114,8 +114,8 @@ const STATE = {
 };
 
 class Scraper {
-  constructor() {
-    const { state } = browser.storage.local.get(['state']);
+  async init() {
+    const { state } = await browser.storage.local.get(['state']);
 
     if (state === STATE.BEFORE_SCRAPE_LECTURE_PAGE) {
       this.state = new BeforeParseLecturePageState();
@@ -131,7 +131,7 @@ class Scraper {
   }
 
   async scrapeInformation() {
-    this.state.scrapeInformation();
+    await this.state.scrapeInformation();
   }
 
   async saveOnLocalStorage() {
@@ -139,11 +139,11 @@ class Scraper {
   }
 
   async stateTransition() {
-    this.state.stateTransition();
+    await this.state.stateTransition();
   }
 
   async pageTransition() {
-    this.state.pageTransition();
+    await this.state.pageTransition();
   }
 
   isNotAllowedToWork() {
@@ -160,10 +160,12 @@ class TimeTableState {
     await browser.storage.local.set({
       lectures,
       oldLectures,
-      lectureNames: lectures.keys(),
-      oldLectureNames: oldLectures.keys(),
-      lectureCount: lectures.keys().length,
+      lectureNames: Object.keys(lectures),
+      oldLectureNames: Object.keys(oldLectures),
+      lectureCount: Object.keys(lectures).length,
     });
+
+    //alert(Array.isArray(Object.keys(lectures)));
   }
 
   async stateTransition() {
@@ -187,7 +189,7 @@ class BeforeParseLecturePageState {
   }
 
   async pageTransition() {
-    const { lectures, lectureNames, lectureCount } = browser.storage.local.get(['lectures', 'lectureNames', 'lectureCount']);
+    const { lectures, lectureNames, lectureCount } = await browser.storage.local.get(['lectures', 'lectureNames', 'lectureCount']);
     const lectureName = lectureNames.pop();
 
     await browser.storage.local.set({
@@ -234,10 +236,10 @@ class ParseLecturePageState {
 class CompleteState {
   async scrapeInformation() {
     const { lectures, oldLectures } = await browser.storage.local.get(['lectures', 'oldLectures']);
-    const lectureNames = lectures.keys();
+    const lectureNames = Object.keys(lectures);
 
     lectureNames.forEach(name => {
-      const titlesOfHomeworks = lectures[name]['homeworks'].keys();
+      const titlesOfHomeworks = Object.keys(lectures[name]['homeworks']);
       titlesOfHomeworks.forEach(title => {
         if (oldLectures[name]['homeworks'][title]) {
           lectures[name]['homeworks'][title]['isDone'] = oldLectures[name]['homeworks'][title]['isDone'];
@@ -261,7 +263,8 @@ const main = async () => {
   if (scraper.isNotAllowedToWork()) {
     return;
   }
-
+  await scraper.init();
+  // await console.log("hogehoge")
   await scraper.scrapeInformation();
   await scraper.stateTransition();
   await scraper.pageTransition();

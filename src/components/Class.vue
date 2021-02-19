@@ -3,14 +3,14 @@
     <v-card elevation="2">
       <p class="card-title">{{ lectureName }}</p>
       <v-list>
-        <v-list-item v-for="(homework, i) in copiedHomeworks" :key="i">
+        <v-list-item v-for="(info, title) in copiedHomeworks" :key="title">
           <template>
             <v-list-item-action>
-              <v-checkbox color="success" v-model="homework.isDone" @click="clickHandler(homework)"> </v-checkbox>
+              <v-checkbox color="success" v-model="info.isDone" @click="clickHandler(title, info)"> </v-checkbox>
             </v-list-item-action>
             <v-list-item-content>
-              <v-list-item-title class="lectureName">{{ homework.title }}</v-list-item-title>
-              <v-list-item-subtitle class="subtitle">〜{{ homework.end }}</v-list-item-subtitle>
+              <v-list-item-title class="lectureName">{{ title }}</v-list-item-title>
+              <v-list-item-subtitle class="subtitle">〜{{ info.deadline }}</v-list-item-subtitle>
             </v-list-item-content>
           </template>
         </v-list-item>
@@ -29,8 +29,8 @@ export default {
     };
   },
   methods: {
-    clickHandler(obj) {
-      this.$emit('changeProg', { homework: obj, lectureName: this.lectureName });
+    clickHandler(title, info) {
+      this.$emit('changeProg', { title, info, lectureName: this.lectureName });
     },
   },
   watch: {

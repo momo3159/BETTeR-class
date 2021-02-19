@@ -3,7 +3,7 @@
     <v-container>
       <v-row>
         <v-col>
-          <v-btn tile color="success" @click="btnHandler" class="reloadBtn">
+          <v-btn tile color="success" @click="fetchHomeWorks" class="reloadBtn">
             <v-icon left> mdi-cached </v-icon>
             課題情報の取得
           </v-btn>
@@ -11,9 +11,9 @@
       </v-row>
       <v-row>
         <v-col>
-          <v-btn tile color="success" @click="greet" class="reloadBtn">
+          <v-btn tile color="success" @click="displayHomeWorks" class="reloadBtn">
             <v-icon left> mdi-file-edit </v-icon>
-            課題情報の反映
+            課題情報の表示
           </v-btn>
         </v-col>
       </v-row>
@@ -24,9 +24,9 @@
       </v-card-title>
 
       <v-container>
-        <v-row v-for="item in homeworks" :key="item.lectureName" :justify="center">
+        <v-row v-for="(homeworks, lectureName) in lectures" :key="lectureName" :justify="center">
           <v-col>
-            <Class :lectureName="item.lectureName" :homeworks="item.homeworks" @changeProg="changeProgHandler" />
+            <Class :lectureName="lectureName" :homeworks="homeworks" @changeProg="changeProgHandler" />
           </v-col>
         </v-row>
       </v-container>
@@ -44,38 +44,26 @@ export default {
 
   data() {
     return {
-      homeworks: [],
+      lectures: {},
     };
   },
   methods: {
-    greet: async function(e) {
-      const { homeworks } = await browser.storage.local.get('homeworks');
-      console.log(homeworks);
-      this.homeworks = [];
-
-      this.homeworks = homeworks;
-
-      console.log(this.homeworks);
+    displayHomeWorks: async function(e) {
+      const { lectures } = await browser.storage.local.get('lectures');
+      // console.log(homeworks);
+      this.lectures = {};
+      this.lectures = lectures;
+      // console.log(this.homeworks);
     },
-    btnHandler: async function() {
-      await browser.storage.local.set({ canParsed: true });
+    fetchHomeWorks: async function() {
+      await browser.storage.local.set({ state: 'SCRAPE_TIMETABLE' });
       const tabs = await browser.tabs.query({ active: true, currentWindow: true });
       await chrome.tabs.update(tabs[0].id, { url: tabs[0].url });
     },
     changeProgHandler: async function(e) {
-      for (let i = 0; i < this.homeworks.length; i++) {
-        if (this.homeworks[i].lectureName === e.lectureName) {
-          for (let j = 0; j < this.homeworks[i].homeworks.length; j++) {
-            if (this.homeworks[i].homeworks[j].title === e.homework.title) {
-              this.homeworks[i].homeworks[j].isDone = e.homework.isDone;
-            }
-          }
-        }
-      }
-
-      let { homeworks } = await browser.storage.local.get('homeworks');
-      homeworks = this.homeworks;
-      await browser.storage.local.set({ homeworks: homeworks });
+      this.lectures[e.lectureNames]['homeworks'][e.title]['isDone'] = e.info.isDone;
+      // this.homeworks[i].homeworks[j].isDone = e.homework.isDone;
+      await browser.storage.local.set({ lectures: this.lectures });
     },
   },
   components: {

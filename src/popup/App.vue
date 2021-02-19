@@ -37,9 +37,9 @@
             <v-icon left> mdi-cached </v-icon>
             RELOAD
           </v-btn>
-          <br>
+          <br />
           期末情報を表示
-          <br>
+          <br />
           期末情報が発表され次第、機能を追加していきます
         </v-tab-item>
       </v-tabs-items>
@@ -48,25 +48,21 @@
 </template>
 
 <script>
-import HomeworksByDueDate from "../components/HomeworksByDueDate.vue";
+import HomeworksByDueDate from '../components/HomeworksByDueDate.vue';
 global.browser = require('webextension-polyfill');
 
 export default {
-  name: "App",
-
+  name: 'App',
   components: {
     HomeworksByDueDate,
   },
 
   data: () => ({
-    tabNames: ["課題", "期末"],
+    tabNames: ['課題', '期末'],
     tab: null,
   }),
-  methods: {
-    
-  },
+  methods: {},
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
