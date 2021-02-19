@@ -15,18 +15,18 @@ const getTimeTable = () => {
   return document.getElementById('schedule-table');
 };
 
-const isNotTakingLecture = cell => {
-  const colAttr = cell.getAttribute('class');
+const isNotTakingLecture = square => {
+  const colAttr = square.getAttribute('class');
   return colAttr.indexOf('blank') > -1 || colAttr === 'schedule-table-class_order';
 };
 
-const isLectureNameNotFound = (lectureNamesAndUrls, lectureName) => {
-  return !lectureNamesAndUrls.find(lectureNamesAndUrl => {
+const isLectureNameFound = (lectureNamesAndUrls, lectureName) => {
+  return lectureNamesAndUrls.find(lectureNamesAndUrl => {
     return lectureNamesAndUrl.name === lectureName;
   });
 };
 
-// 時間割をパース　-> セルに分割
+// 時間割をパース -> セルに分割
 const parseTimeTable = timeTable => {
   const lectureNamesAndUrls = [];
 
@@ -37,17 +37,19 @@ const parseTimeTable = timeTable => {
     for (const square of squares) {
       if (isNotTakingLecture(square)) {
         continue;
-      } else {
-        const lectureName = square.children[0].children[0].innerText;
-        const url = square.children[0].children[0].getAttribute('href');
-
-        if (isLectureNameNotFound(lectureNamesAndUrls, lectureName)) {
-          lectureNamesAndUrls.push({
-            name: lectureName,
-            url: BASE + url,
-          });
-        }
       }
+
+      const lectureName = square.children[0].children[0].innerText;
+      const url = square.children[0].children[0].getAttribute('href');
+
+      if (isLectureNameFound(lectureNamesAndUrls, lectureName)) {
+        continue;
+      }
+
+      lectureNamesAndUrls.push({
+        name: lectureName,
+        url: BASE + url,
+      });
     }
   }
 
