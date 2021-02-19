@@ -1,18 +1,34 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+import createPersistedState from 'vuex-persistedstate';
 
-import * as getters from './getters';
-import mutations from './mutations';
-import * as actions from './actions';
-
+global.browser = require('webextension-polyfill');
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    foo: 'bar',
-    homeworks: []
+    canParsed: false,
+    alreadyParsed: false,
+    beforeGetHW: true,
+    lectures: {},
+    lectureCount: 0,
   },
-  getters,
-  mutations,
-  actions,
+  mutations: {
+    updateCanParsed(state, payload) {
+      state.canParsed = payload.canParsed;
+    },
+    updateAlreadyParsed(state, payload) {
+      state.alreadyParsed = payload.alreadyParsed;
+    },
+    updateBeforeGetHomeWorks(state, payload) {
+      state.beforeGetHW = payload.beforeGetHW;
+    },
+    updateLectures(state, payload) {
+      state.lectures = payload.lectures;
+    },
+    updateLectureCount(state, payload) {
+      state.lectureCount = payload.lectureCount;
+    },
+  },
+  plugins: [createPersistedState()],
 });
