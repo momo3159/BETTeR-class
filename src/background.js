@@ -1,4 +1,4 @@
-import store from './store'
+import store from './store';
 global.browser = require('webextension-polyfill');
 
 // インストールした時に実行
@@ -14,28 +14,23 @@ browser.runtime.onInstalled.addListener(function() {
    * isLecPage
    *
    */
-  browser.storage.local.set({ 
-      canParsed: false, 
-      alreadyParsed: false, 
-      beforeGetHW: true,
-      lectures: [], 
-      lectureCount: 0,
-      homeworks: [],
-      oldHomeWorks: []
-  })
+  browser.storage.local.set({
+    state: 'SCRAPE_TIMETABLE',
+    lectures: [],
+    lectureCount: 0,
+    homeworks: [],
+    oldHomeWorks: [],
+  });
 });
 
-
 // 起動時に実行
-
-
 
 // browser.browserAction.onClicked.addListener(function(tab) {
 //     console.log("hogehogehogheohgoeghoe")
 //     browser.storage.local.get(['homeworks']).then((item)=> {
 //         console.log(item)
 //     })
-    
+
 // });
 
 // browser.browserAction.setPopup({popup: './popup/popup.html'})
