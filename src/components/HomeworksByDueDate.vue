@@ -51,7 +51,6 @@ export default {
     displayHomeWorks: async function(e) {
       console.log(this.lectures);
       const { lectures } = await browser.storage.local.get('lectures');
-      // console.log(homeworks);
       Object.keys(lectures).forEach(name => {
         this.$set(this.lectures, name, lectures[name]);
       });
@@ -62,9 +61,6 @@ export default {
       await chrome.tabs.update(tabs[0].id, { url: tabs[0].url });
     },
     changeProgHandler: async function(e) {
-      // this.$set(this.lectures[e.lectureNames]['homeworks'][e.title], 'isDone', e.info.isDone)
-      // this.lectures[e.lectureNames]['homeworks'][e.title]['isDone'] = e.info.isDone;
-      // this.homeworks[i].homeworks[j].isDone = e.homework.isDone;
       await browser.storage.local.set({ lectures: this.lectures });
     },
   },

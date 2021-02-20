@@ -30,7 +30,6 @@ const isNotReportAndQuiz = category => {
 const getLectures = timeTable => {
   const lectures = {};
 
-  // [tr, tr, ..., tr]
   const tableRows = timeTable.children[1].children;
   for (const tableRow of tableRows) {
     const squares = tableRow.children;
@@ -63,17 +62,13 @@ const getPanels = () => {
 };
 
 const getHomeWorksOfLecture = sessions => {
-  // const panelHeader = session.children[0];
-  // const panelTitle = panelHeader.children[0].innerText;
   const homeworks = {};
 
   for (const session of sessions) {
     const itemsOfSession = session.children[1].children;
 
     for (const item of itemsOfSession) {
-      // const content = item.children[0];
       const contentInfo = item.children[0].children[0];
-      // const contentDetail = content.children[1]
       const contentCategory = contentInfo.children[1].innerText;
 
       if (isNotReportAndQuiz(contentCategory)) {
@@ -166,8 +161,6 @@ class TimeTableState {
       oldLectureNames: Object.keys(oldLectures),
       lectureCount: Object.keys(lectures).length,
     });
-
-    //alert(Array.isArray(Object.keys(lectures)));
   }
 
   async stateTransition() {
@@ -268,12 +261,10 @@ const main = async () => {
   await scraper.init();
 
   if (scraper.isNotAllowedToWork()) {
-    // alert(await browser.storage.local.get('state').state);
     await browser.storage.local.set({ state: '' });
     return;
   }
 
-  // await console.log("hogehoge")
   await scraper.scrapeInformation();
   await scraper.stateTransition();
   await scraper.pageTransition();

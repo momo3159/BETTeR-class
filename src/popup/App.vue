@@ -23,25 +23,11 @@
             <v-icon left> mdi-cached </v-icon>
             RELOAD
           </v-btn>
-          e-classの資料を表示
-        </v-tab-item>
-        <v-tab-item>
-          <v-btn tile color="success">
-            <v-icon left> mdi-cached </v-icon>
-            RELOAD
-          </v-btn>
-          duetのメッセージを表示
-        </v-tab-item> -->
-        <v-tab-item>
-          <v-btn tile color="success">
-            <v-icon left> mdi-cached </v-icon>
-            RELOAD
-          </v-btn>
           <br />
           期末情報を表示
           <br />
           期末情報が発表され次第、機能を追加していきます
-        </v-tab-item>
+        </v-tab-item> -->
       </v-tabs-items>
     </v-main>
   </v-app>
