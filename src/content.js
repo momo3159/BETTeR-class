@@ -91,7 +91,7 @@ const getHomeWorksOfLecture = sessions => {
       if (withinDeadline(new Date(), deadline)) {
         homeworks[title] = {
           deadline,
-          idDone: false,
+          isDone: false,
         };
       }
     }
@@ -242,11 +242,14 @@ class CompleteState {
 
     lectureNames.forEach(name => {
       const titlesOfHomeworks = Object.keys(lectures[name]['homeworks']);
-      titlesOfHomeworks.forEach(title => {
-        if (oldLectures[name]['homeworks'][title]) {
-          lectures[name]['homeworks'][title]['isDone'] = oldLectures[name]['homeworks'][title]['isDone'];
-        }
-      });
+      console.log(titlesOfHomeworks);
+      if (Object.keys(oldLectures) > 0) {
+        titlesOfHomeworks.forEach(title => {
+          if (oldLectures[name]['homeworks'][title]) {
+            lectures[name]['homeworks'][title]['isDone'] = oldLectures[name]['homeworks'][title]['isDone'];
+          }
+        });
+      }
     });
     await browser.storage.local.set({ lectures });
   }
