@@ -24,9 +24,9 @@
       </v-card-title>
 
       <v-container>
-        <v-row v-for="(homeworks, lectureName) in lectures" :key="lectureName" :justify="center">
+        <v-row v-for="(lectureInfo, lectureName) in lectures" :key="lectureName" :justify="center">
           <v-col>
-            <Class :lectureName="lectureName" :homeworks="homeworks" @changeProg="changeProgHandler" />
+            <Class :lectureName="lectureName" :homeworks="lectureInfo.homeworks" @changeProg="changeProgHandler" />
           </v-col>
         </v-row>
       </v-container>
@@ -49,11 +49,12 @@ export default {
   },
   methods: {
     displayHomeWorks: async function(e) {
+      console.log(this.lectures);
       const { lectures } = await browser.storage.local.get('lectures');
       // console.log(homeworks);
-      this.lectures = {};
-      this.lectures = lectures;
-      // console.log(this.homeworks);
+      Object.keys(lectures).forEach(name => {
+        this.$set(this.lectures, name, lectures[name]);
+      });
     },
     fetchHomeWorks: async function() {
       await browser.storage.local.set({ state: 'SCRAPE_TIMETABLE' });
@@ -61,7 +62,8 @@ export default {
       await chrome.tabs.update(tabs[0].id, { url: tabs[0].url });
     },
     changeProgHandler: async function(e) {
-      this.lectures[e.lectureNames]['homeworks'][e.title]['isDone'] = e.info.isDone;
+      // this.$set(this.lectures[e.lectureNames]['homeworks'][e.title], 'isDone', e.info.isDone)
+      // this.lectures[e.lectureNames]['homeworks'][e.title]['isDone'] = e.info.isDone;
       // this.homeworks[i].homeworks[j].isDone = e.homework.isDone;
       await browser.storage.local.set({ lectures: this.lectures });
     },
