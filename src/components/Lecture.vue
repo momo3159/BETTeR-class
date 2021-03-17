@@ -21,7 +21,7 @@
 
 <script>
 export default {
-  name: 'Class',
+  name: 'Lecture',
   props: ['lectureName', 'homeworks'],
   data() {
     return {
@@ -32,7 +32,7 @@ export default {
     clickHandler(title, info) {
       console.log(info);
       console.log(title);
-      this.$emit('changeProg', { title, info, lectureName: this.lectureName });
+      this.$emit('changeState', { title, info, lectureName: this.lectureName });
     },
   },
   watch: {
