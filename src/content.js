@@ -3,6 +3,7 @@ global.browser = require('webextension-polyfill');
 const BASE = 'https://eclass.doshisha.ac.jp';
 const REPORT = 'レポート';
 const QUIZ = '一問一答';
+const TEST = "試験"
 
 const isNotTakingLecture = square => {
   const colAttr = square.getAttribute('class');
@@ -24,7 +25,7 @@ const withinDeadline = (date, deadline) => {
 };
 
 const isNotReportAndQuiz = category => {
-  return category.indexOf(REPORT) === -1 && category.indexOf(QUIZ) === -1;
+  return category.indexOf(REPORT) === -1 && category.indexOf(QUIZ) === -1 && category.indexOf(TEST) === -1;
 };
 
 const getLectures = timeTable => {
