@@ -26,7 +26,7 @@
       <v-container>
         <v-row v-for="(lectureInfo, lectureName) in lectures" :key="lectureName" :justify="center">
           <v-col>
-            <Class :lectureName="lectureName" :homeworks="lectureInfo.homeworks" @changeProg="changeProgHandler" />
+            <Class :lectureName="lectureName" :homeworks="lectureInfo.homeworks" @changeState="changeStateOfHomework" />
           </v-col>
         </v-row>
       </v-container>
@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import Class from './Class';
+import Lecture from './Lecture';
 global.browser = require('webextension-polyfill');
 
 export default {
@@ -60,12 +60,12 @@ export default {
       const tabs = await browser.tabs.query({ active: true, currentWindow: true });
       await chrome.tabs.update(tabs[0].id, { url: tabs[0].url });
     },
-    changeProgHandler: async function(e) {
+    changeStateOfHomework: async function(e) {
       await browser.storage.local.set({ lectures: this.lectures });
     },
   },
   components: {
-    Class,
+    Lecture,
   },
 };
 </script>
