@@ -26,7 +26,7 @@
       <v-container>
         <v-row v-for="(lectureInfo, lectureName) in lectures" :key="lectureName" :justify="center">
           <v-col>
-            <Class :lectureName="lectureName" :homeworks="lectureInfo.homeworks" @changeState="changeStateOfHomework" />
+            <Lecture :lectureName="lectureName" :homeworks="lectureInfo.homeworks" @changeState="changeStateOfHomework" />
           </v-col>
         </v-row>
       </v-container>
