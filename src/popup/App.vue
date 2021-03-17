@@ -44,7 +44,10 @@ export default {
   },
 
   data: () => ({
-    tabNames: ['課題', '期末'],
+    tabNames: [
+      '課題', 
+      // '期末'
+    ],
     tab: null,
   }),
   methods: {},
