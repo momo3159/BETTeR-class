@@ -30,8 +30,6 @@ export default {
   },
   methods: {
     clickHandler(title, info) {
-      console.log(info);
-      console.log(title);
       this.$emit('changeState', { title, info, lectureName: this.lectureName });
     },
   },
