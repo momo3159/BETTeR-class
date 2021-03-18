@@ -49,7 +49,10 @@ export default {
   },
   methods: {
     displayHomeWorks: async function(e) {
-      const { lectures } = await browser.storage.local.get('lectures');
+      const { lectures, oldLectures } = await browser.storage.local.get(["lectures", "oldLectures"]);
+      Object.keys(oldLectures).forEach(name => {
+        this.$delete(this.lectures, name);
+      })
       Object.keys(lectures).forEach(name => {
         this.$set(this.lectures, name, lectures[name]);
       });
