@@ -6,7 +6,7 @@
         <v-list-item v-for="(info, title) in homeworks" :key="title">
           <template>
             <v-list-item-action>
-              <v-checkbox color="success" v-model="info.isDone" @click="clickHandler(title, info)"> </v-checkbox>
+              <v-checkbox color="success" v-model="info.isDone" @click="clickHandler"> </v-checkbox>
             </v-list-item-action>
             <v-list-item-content>
               <v-list-item-title class="lectureName">{{ title }}</v-list-item-title>
@@ -24,8 +24,8 @@ export default {
   name: 'Lecture',
   props: ['lectureName', 'homeworks'],
   methods: {
-    clickHandler(title, info) {
-      this.$emit('changeState', { title, info, lectureName: this.lectureName });
+    clickHandler() {
+      this.$emit('changeState');
     },
   },
 };
