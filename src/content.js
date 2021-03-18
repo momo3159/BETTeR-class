@@ -210,7 +210,6 @@ class ParseLecturePageState {
     lectures[lectureName].homeworks = homeworks;
 
     await browser.storage.local.set({ lectures });
-    console.log('残り数' + (await browser.storage.local.get(['lectureCount'])).lectureCount);
   }
 
   async stateTransition() {
@@ -236,7 +235,6 @@ class CompleteState {
 
     lectureNames.forEach(name => {
       const titlesOfHomeworks = Object.keys(lectures[name]['homeworks']);
-      console.log(titlesOfHomeworks);
       if (Object.keys(oldLectures) > 0) {
         titlesOfHomeworks.forEach(title => {
           if (oldLectures[name]['homeworks'][title]) {
