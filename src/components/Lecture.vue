@@ -3,7 +3,7 @@
     <v-card elevation="2">
       <p class="card-title">{{ lectureName }}</p>
       <v-list>
-        <v-list-item v-for="(info, title) in copiedHomeworks" :key="title">
+        <v-list-item v-for="(info, title) in homeworks" :key="title">
           <template>
             <v-list-item-action>
               <v-checkbox color="success" v-model="info.isDone" @click="clickHandler(title, info)"> </v-checkbox>
@@ -23,19 +23,9 @@
 export default {
   name: 'Lecture',
   props: ['lectureName', 'homeworks'],
-  data() {
-    return {
-      copiedHomeworks: this.homeworks,
-    };
-  },
   methods: {
     clickHandler(title, info) {
       this.$emit('changeState', { title, info, lectureName: this.lectureName });
-    },
-  },
-  watch: {
-    homeworks(newVal) {
-      this.copiedHomeworks = newVal;
     },
   },
 };
