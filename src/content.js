@@ -235,7 +235,7 @@ class CompleteState {
 
     lectureNames.forEach(name => {
       const titlesOfHomeworks = Object.keys(lectures[name]['homeworks']);
-      if (Object.keys(oldLectures)[name]) {
+      if (Object.keys(oldLectures).includes(name)) {
         titlesOfHomeworks.forEach(title => {
           if (oldLectures[name]['homeworks'][title]) {
             lectures[name]['homeworks'][title]['isDone'] = oldLectures[name]['homeworks'][title]['isDone'];
