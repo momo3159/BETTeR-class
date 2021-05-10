@@ -1,5 +1,8 @@
 # better-class
 同志社大学のe-classから課題の情報を取得し、管理するchrome拡張です。
+
+最新版のコードは現在devブランチ
+
 ## Project setup
 ```
 npm install
@@ -20,5 +23,3 @@ npm run build
 npm run lint
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
