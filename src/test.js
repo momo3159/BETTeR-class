@@ -1,4 +1,7 @@
-import { getLectures } from './content';
+import { getLectures, withinDeadline } from './content';
+
+global.chrome = chrome;
+global.browser = browser;
 
 const _timeTable = `
 <table class="schedule-table" id="schedule-table">
@@ -132,13 +135,16 @@ const stringToElement = str => {
 };
 
 test('時間割のパース', () => {
-  global.chrome = chrome;
-  global.browser = browser;
-
   expect(getLectures(stringToElement(_timeTable))).toStrictEqual({
     コンピュータ基礎実習: { url: 'https://eclass.doshisha.ac.jp/hoge', homeworks: {} },
     情報工学概論Ⅱ: { url: 'https://eclass.doshisha.ac.jp/hoge', homeworks: {} },
     ＣプログラミングⅡ: { url: 'https://eclass.doshisha.ac.jp/hoge', homeworks: {} },
     情報数学Ⅰ: { url: 'https://eclass.doshisha.ac.jp/hoge', homeworks: {} },
   });
+});
+
+test('締め切りを過ぎていないかの判定', () => {
+  expect(withinDeadline(new Date('2020/12/19 23:57'), '2020/12/19 23:57')).toBe(false);
+  expect(withinDeadline(new Date('2020/12/18 23:57'), '2020/12/19 3:57')).toBe(true);
+  expect(withinDeadline(new Date('2020/12/19 23:57'), '2020/12/19 23:58')).toBe(true);
 });
