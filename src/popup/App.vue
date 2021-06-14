@@ -23,50 +23,35 @@
             <v-icon left> mdi-cached </v-icon>
             RELOAD
           </v-btn>
-          e-classの資料を表示
-        </v-tab-item>
-        <v-tab-item>
-          <v-btn tile color="success">
-            <v-icon left> mdi-cached </v-icon>
-            RELOAD
-          </v-btn>
-          duetのメッセージを表示
-        </v-tab-item> -->
-        <v-tab-item>
-          <v-btn tile color="success">
-            <v-icon left> mdi-cached </v-icon>
-            RELOAD
-          </v-btn>
-          <br>
+          <br />
           期末情報を表示
-          <br>
+          <br />
           期末情報が発表され次第、機能を追加していきます
-        </v-tab-item>
+        </v-tab-item> -->
       </v-tabs-items>
     </v-main>
   </v-app>
 </template>
 
 <script>
-import HomeworksByDueDate from "../components/HomeworksByDueDate.vue";
+import HomeworksByDueDate from '../components/HomeworksByDueDate.vue';
 global.browser = require('webextension-polyfill');
 
 export default {
-  name: "App",
-
+  name: 'App',
   components: {
     HomeworksByDueDate,
   },
 
   data: () => ({
-    tabNames: ["課題", "期末"],
+    tabNames: [
+      '課題', 
+      // '期末'
+    ],
     tab: null,
   }),
-  methods: {
-    
-  },
+  methods: {},
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

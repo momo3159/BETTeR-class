@@ -10,10 +10,9 @@ const config = {
   mode: process.env.NODE_ENV,
   context: __dirname + '/src',
   entry: {
-    'background': './background.js',
+    background: './background.js',
     'popup/popup': './popup/popup.js',
-    "content": "./content.js",
-    "content_detail": "./content_detail.js"
+    content: './content.js',
   },
   output: {
     path: __dirname + '/dist',
@@ -75,13 +74,13 @@ const config = {
             // Requires sass-loader@^7.0.0
             options: {
               implementation: require('sass'),
-              indentedSyntax: true // optional
+              indentedSyntax: true, // optional
             },
             // Requires sass-loader@^8.0.0
             options: {
               implementation: require('sass'),
               sassOptions: {
-                indentedSyntax: true // optional
+                indentedSyntax: true, // optional
               },
             },
           },
@@ -103,7 +102,7 @@ const config = {
       {
         from: 'manifest.json',
         to: 'manifest.json',
-        transform: (content) => {
+        transform: content => {
           const jsonContent = JSON.parse(content);
           jsonContent.version = version;
 
