@@ -14,7 +14,7 @@ const isLectureNameFound = (lectures, lectureName) => {
   return lectureName in lectures;
 };
 
-const withinDeadline = (date, deadline) => {
+export const withinDeadline = (date, deadline) => {
   // format: 2020/12/19 23:57
   const [ymd, t] = deadline.split(' ');
   const [y, m, d] = ymd.split('/');
