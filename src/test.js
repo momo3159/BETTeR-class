@@ -141,6 +141,7 @@ test('時間割のパース', () => {
     ＣプログラミングⅡ: { url: 'https://eclass.doshisha.ac.jp/hoge', homeworks: {} },
     情報数学Ⅰ: { url: 'https://eclass.doshisha.ac.jp/hoge', homeworks: {} },
   });
+  expect(() => getLectures(null)).toThrow('No Lectures in this year');
 });
 
 test('締め切りを過ぎていないかの判定', () => {

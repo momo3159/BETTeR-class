@@ -29,6 +29,7 @@ const isNotReportAndQuiz = category => {
 };
 
 export const getLectures = timeTable => {
+  if (timeTable == null) throw new Error('No Lectures in this year');
   const lectures = {};
 
   const tableRows = timeTable.children[1].children;
@@ -234,11 +235,11 @@ class CompleteState {
     const lectureNames = Object.keys(lectures);
 
     lectureNames.forEach(name => {
-      const titlesOfHomeworks = Object.keys(lectures[name]['homeworks']);
+      const titlesOfHomeworks = Object.keys(lectures[name].homeworks);
       if (Object.keys(oldLectures).includes(name)) {
         titlesOfHomeworks.forEach(title => {
-          if (oldLectures[name]['homeworks'][title]) {
-            lectures[name]['homeworks'][title]['isDone'] = oldLectures[name]['homeworks'][title]['isDone'];
+          if (oldLectures[name].homeworks[title]) {
+            lectures[name].homeworks[title].isDone = oldLectures[name].homeworks[title].isDone;
           }
         });
       }
