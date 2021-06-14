@@ -3,7 +3,7 @@ global.browser = require('webextension-polyfill');
 const BASE = 'https://eclass.doshisha.ac.jp';
 const REPORT = 'レポート';
 const QUIZ = '一問一答';
-const TEST = "試験"
+const TEST = '試験';
 
 const isNotTakingLecture = square => {
   const colAttr = square.getAttribute('class');
@@ -28,7 +28,7 @@ const isNotReportAndQuiz = category => {
   return category.indexOf(REPORT) === -1 && category.indexOf(QUIZ) === -1 && category.indexOf(TEST) === -1;
 };
 
-const getLectures = timeTable => {
+export const getLectures = timeTable => {
   const lectures = {};
 
   const tableRows = timeTable.children[1].children;
@@ -39,7 +39,7 @@ const getLectures = timeTable => {
         continue;
       }
 
-      const lectureName = square.children[0].children[0].innerText.substring(3).split(' ')[0];
+      const lectureName = square.children[0].children[0].innerHTML.substring(3).split(' ')[0];
       const url = square.children[0].children[0].getAttribute('href');
 
       // 複数コマの授業に対応（e.g 情報工学実験1）
